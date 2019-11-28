@@ -19,81 +19,76 @@ namespace ExpressionInterpreter.Logic
 			get { return _operandLeft; }
 		}
 
-		public double OperandRight
-		{
+        public double OperandRight
+        {
 			get { return _operandRight; }
 
 		}
 
 		public char Op
-		{
-			get { return _op; }
-		}
+        {
+            get { return _op; }
+        }
 
 
 		public void Parse(string expressionText)
 		{
-			if (expressionText == null || expressionText == "" || expressionText == " ")
-			{
-				throw new Exception("Ausdruck ist null oder empty!");
-			}
 			ExpressionText = expressionText;
 			ParseExpressionStringToFields();
 		}
 
-		/// <summary>
-		/// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
-		/// Fehlerhafte Operatoren und Division durch 0 werden über Exceptions zurückgemeldet
-		/// </summary>
-		public double Calculate()
-		{
-			double result = 0;
+        /// <summary>
+        /// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
+        /// Fehlerhafte Operatoren und Division durch 0 werden über Exceptions zurückgemeldet
+        /// </summary>
+        public double Calculate()
+        {
+            double result = 0;
 
-			if (Op.Equals('+'))
-			{
-				result = OperandLeft + OperandRight;
-			}
-			else if (Op.Equals('-'))
-			{
-				result = OperandLeft - OperandRight;
-			}
-			else if (Op.Equals('*'))
-			{
-				result = OperandLeft * OperandRight;
-			}
-			else if (Op.Equals('/'))
-			{
-				if (OperandRight != 0)
-				{
-					result = OperandLeft / OperandRight;
-				}
-			}
+            switch (Op)
+            {
+                case '+':
+                    result = OperandLeft + OperandRight;
+                    break;
+                case '-':
+                    result = OperandLeft - OperandRight;
+                    break;
+                case '*':
+                    result = OperandLeft * OperandRight;
+                    break;
+                case '/':
+                    if (OperandRight != 0)
+                    {
+                        result = OperandLeft / OperandRight;
+                    }
+                    break;
+            }
 
-			return result;
-		}
+            return result;
+        }
 
-		/// <summary>
-		/// Expressionstring in seine Bestandteile zerlegen und in die Felder speichern.
-		/// 
-		///     { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
-		///     
-		/// Syntax  OP = +-*/
-		///         Vorzeichen -
-		///         Zahlen double/int
-		///         Trennzeichen Leerzeichen zwischen OP, Vorzeichen und Zahlen
-		/// </summary>
-		public void ParseExpressionStringToFields()
-		{
-
-			int pos = 0;
-			_operandLeft = ScanNumber(ref pos);
-			SkipBlanks(ref pos);
-			_op = ExpressionText[pos];
-			SkipBlanks(ref pos);
-			_operandRight = ScanNumber(ref pos);
-			SkipBlanks(ref pos);
-
-		}
+        /// <summary>
+        /// Expressionstring in seine Bestandteile zerlegen und in die Felder speichern.
+        /// 
+        ///     { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
+        ///     
+        /// Syntax  OP = +-*/
+        ///         Vorzeichen -
+        ///         Zahlen double/int
+        ///         Trennzeichen Leerzeichen zwischen OP, Vorzeichen und Zahlen
+        /// </summary>
+        public void ParseExpressionStringToFields()
+        {
+            // { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
+            int pos = 0;
+            SkipBlanks(ref pos);
+            _operandLeft = ScanNumber(ref pos);
+            SkipBlanks(ref pos);
+            _op = ExpressionText[pos];
+            SkipBlanks(ref pos);
+            _operandRight = ScanNumber(ref pos);
+            SkipBlanks(ref pos);
+        }
 
 		/// <summary>
 		/// Ein Double muss mit einer Ziffer beginnen. Gibt es Nachkommastellen,
@@ -103,9 +98,25 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private double ScanNumber(ref int pos)
 		{
+            double result;
+            double sign = 1;
 
-			throw new NotImplementedException();
-		}
+            if (ExpressionText[pos].Equals('-'))
+            {
+                sign = -sign;
+                pos++;
+                SkipBlanks(ref pos);
+            }
+            result = ScanInteger(ref pos);
+            if (ExpressionText[pos].Equals(','))
+            {
+                pos++;
+                int startPos = pos;
+                double decimalPlace = ScanInteger(ref pos);
+                result += decimalPlace / (Math.Pow(10, pos - startPos));
+            }
+            return result;
+        }
 
 		/// <summary>
 		/// Eine Ganzzahl muss mit einer Ziffer beginnen.
@@ -114,15 +125,23 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
-			int number = 0;
-			while (ExpressionText[pos] != ' ' && ExpressionText[pos] >= '0' && ExpressionText[pos] <= '9' && ExpressionText.Length < pos)
-			{
-				number = number * 10 + (ExpressionText[pos] - '0');
-				pos++;
-			}
+            int number = 0;
 
-			return number;
-		}
+            if (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
+            {
+                while (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
+                {
+                    number = number * 10 + ExpressionText[pos] - '0';
+                    pos++;
+                }
+            }
+            else
+            {
+                pos++;
+            }
+
+            return number;
+        }
 
 		/// <summary>
 		/// Setzt die Position weiter, wenn Leerzeichen vorhanden sind
@@ -130,11 +149,11 @@ namespace ExpressionInterpreter.Logic
 		/// <param name="pos"></param>
 		private void SkipBlanks(ref int pos)
 		{
-			while (ExpressionText[pos] != ' ' && ExpressionText.Length < pos)
-			{
-				pos++;
-			}
-		}
+            while (ExpressionText.Length < pos && ExpressionText[pos] != ' ')
+            {
+                pos++;
+            }
+        }
 
 		/// <summary>
 		/// Exceptionmessage samt Innerexception-Texten ausgeben
@@ -143,7 +162,6 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		public static string GetExceptionTextWithInnerExceptions(Exception ex)
 		{
-
 			throw new NotImplementedException();
 		}
 	}
