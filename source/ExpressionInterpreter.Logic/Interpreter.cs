@@ -21,10 +21,11 @@ namespace ExpressionInterpreter.Logic
 
         public double OperandRight
         {
-            get { throw new NotImplementedException(); }
-        }
+			get { return 1.2;}
 
-        public char Op
+		}
+
+		public char Op
         {
             get { throw new NotImplementedException(); }
         }
