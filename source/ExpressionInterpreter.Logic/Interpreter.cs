@@ -19,53 +19,58 @@ namespace ExpressionInterpreter.Logic
 			get { return _operandLeft; }
 		}
 
-        public double OperandRight
-        {
+		public double OperandRight
+		{
 			get { return _operandRight; }
 
 		}
 
 		public char Op
-        {
-            get { return _op; }
-        }
+		{
+			get { return _op; }
+		}
 
 
 		public void Parse(string expressionText)
 		{
+			if (expressionText == null || expressionText == "" || expressionText == " ")
+			{
+				throw new Exception("Ausdruck ist null oder empty!");
+			}
 			ExpressionText = expressionText;
 			ParseExpressionStringToFields();
 		}
 
-        /// <summary>
-        /// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
-        /// Fehlerhafte Operatoren und Division durch 0 werden über Exceptions zurückgemeldet
-        /// </summary>
-        public double Calculate()
-        {
-            double result = 0;
+		/// <summary>
+		/// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
+		/// Fehlerhafte Operatoren und Division durch 0 werden über Exceptions zurückgemeldet
+		/// </summary>
+		public double Calculate()
+		{
+			double result = 0;
 
-            switch (Op)
+            if (Op.Equals('+'))
             {
-                case '+':
-                    result = OperandLeft + OperandRight;
-                    break;
-                case '-':
-                    result = OperandLeft - OperandRight;
-                    break;
-                case '*':
-                    result = OperandLeft * OperandRight;
-                    break;
-                case '/':
-                    if (OperandRight != 0)
-                    {
-                        result = OperandLeft / OperandRight;
-                    }
-                    break;
+                result = OperandLeft + OperandRight;
+            }
+            else if (Op.Equals('-'))
+            {
+                result = OperandLeft - OperandRight;
+            }
+            else if (Op.Equals('*'))
+            {
+                result = OperandLeft * OperandRight;
+            }
+            else if (Op.Equals('/'))
+            {
+                if (OperandRight != 0)
+                {
+                    result = OperandLeft / OperandRight;
+                }
             }
 
-            return result;
-        }
+			return result;
+		}
 
         /// <summary>
         /// Expressionstring in seine Bestandteile zerlegen und in die Felder speichern.
@@ -79,9 +84,7 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public void ParseExpressionStringToFields()
         {
-            // { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
             int pos = 0;
-            SkipBlanks(ref pos);
             _operandLeft = ScanNumber(ref pos);
             SkipBlanks(ref pos);
             _op = ExpressionText[pos];
@@ -98,25 +101,8 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private double ScanNumber(ref int pos)
 		{
-            double result;
-            double sign = 1;
-
-            if (ExpressionText[pos].Equals('-'))
-            {
-                sign = -sign;
-                pos++;
-                SkipBlanks(ref pos);
-            }
-            result = ScanInteger(ref pos);
-            if (ExpressionText[pos].Equals(','))
-            {
-                pos++;
-                int startPos = pos;
-                double decimalPlace = ScanInteger(ref pos);
-                result += decimalPlace / (Math.Pow(10, pos - startPos));
-            }
-            return result;
-        }
+			throw new NotImplementedException();
+		}
 
 		/// <summary>
 		/// Eine Ganzzahl muss mit einer Ziffer beginnen.
@@ -125,20 +111,12 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
-            int number = 0;
-
-            if (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
-            {
-                while (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
-                {
-                    number = number * 10 + ExpressionText[pos] - '0';
-                    pos++;
-                }
-            }
-            else
-            {
-                pos++;
-            }
+			int number = 0;
+			while(ExpressionText[pos] != ' ' && ExpressionText[pos] >= 48 && ExpressionText[pos] < 57 && ExpressionText.Length < pos)
+			{
+				number = number * 10 + ExpressionText[pos] - '0';
+				pos++;
+			}
 
             return number;
         }
@@ -149,11 +127,11 @@ namespace ExpressionInterpreter.Logic
 		/// <param name="pos"></param>
 		private void SkipBlanks(ref int pos)
 		{
-            while (ExpressionText.Length < pos && ExpressionText[pos] != ' ')
-            {
-                pos++;
-            }
-        }
+			while(ExpressionText[pos] != ' ' && ExpressionText.Length < pos)
+			{
+				pos++;
+			}
+		}
 
 		/// <summary>
 		/// Exceptionmessage samt Innerexception-Texten ausgeben
@@ -162,6 +140,7 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		public static string GetExceptionTextWithInnerExceptions(Exception ex)
 		{
+
 			throw new NotImplementedException();
 		}
 	}
