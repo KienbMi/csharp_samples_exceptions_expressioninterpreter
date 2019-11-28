@@ -102,16 +102,12 @@ namespace ExpressionInterpreter.Logic
 		private int ScanInteger(ref int pos)
 		{
 			int number = 0;
-			int _pos = pos;
-			while(ExpressionText[pos] != ' ')
+			while(ExpressionText[pos] != ' ' && ExpressionText[pos] >= 48 && ExpressionText[pos] < 57 && ExpressionText.Length < pos)
 			{
+				number = number * 10 + ExpressionText[pos] - '0';
 				pos++;
 			}
-			number = ExpressionText[pos];
-			for (int i = pos; i > _pos; i--)
-			{
-				number = number + i * 10;
-			}
+
 			return number;
 		}
 
