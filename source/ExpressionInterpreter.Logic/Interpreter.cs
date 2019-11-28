@@ -80,7 +80,13 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public void ParseExpressionStringToFields()
         {
-            throw new NotImplementedException();
+            int pos = 0;
+            _operandLeft = ScanNumber(ref pos);
+            SkipBlanks(ref pos);
+            _op = ExpressionText[pos];
+            SkipBlanks(ref pos);
+            _operandRight = ScanNumber(ref pos);
+            SkipBlanks(ref pos);
         }
 
 		/// <summary>
