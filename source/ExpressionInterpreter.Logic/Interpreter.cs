@@ -16,7 +16,7 @@ namespace ExpressionInterpreter.Logic
 
         public double OperandLeft
         {
-            get { throw new NotImplementedException(); }
+            get { return _operandLeft; }
         }
 
         public double OperandRight
