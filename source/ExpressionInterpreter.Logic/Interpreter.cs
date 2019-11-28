@@ -49,25 +49,24 @@ namespace ExpressionInterpreter.Logic
 		{
 			double result = 0;
 
-            if (Op.Equals('+'))
-            {
-                result = OperandLeft + OperandRight;
-            }
-            else if (Op.Equals('-'))
-            {
-                result = OperandLeft - OperandRight;
-            }
-            else if (Op.Equals('*'))
-            {
-                result = OperandLeft * OperandRight;
-            }
-            else if (Op.Equals('/'))
-            {
-                if (OperandRight != 0)
-                {
-                    result = OperandLeft / OperandRight;
-                }
-            }
+			switch (Op)
+			{
+				case '+':
+					result = OperandLeft + OperandRight;
+					break;
+				case '-':
+					result = OperandLeft - OperandRight;
+					break;
+				case '*':
+					result = OperandLeft * OperandRight;
+					break;
+				case '/':
+					if (OperandRight != 0)
+					{
+						result = OperandLeft / OperandRight;
+					}
+					break;
+			}
 
 			return result;
 		}
@@ -101,7 +100,24 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private double ScanNumber(ref int pos)
 		{
-			throw new NotImplementedException();
+			double result;
+			double sign = 1;
+
+			if (ExpressionText[pos].Equals('-'))
+			{
+				sign = -sign;
+				pos++;
+				SkipBlanks(ref pos);
+			}
+			result = ScanInteger(ref pos);
+			if (ExpressionText[pos].Equals(','))
+			{
+				pos++;
+				int startPos = pos;
+				double decimalPlace = ScanInteger(ref pos);
+				result += decimalPlace / (Math.Pow(10, pos - startPos));
+			}
+			return result;
 		}
 
 		/// <summary>
