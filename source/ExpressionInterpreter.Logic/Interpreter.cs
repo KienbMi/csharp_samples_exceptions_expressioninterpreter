@@ -107,7 +107,14 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
-			throw new NotImplementedException();
+			int number = 0;
+			while(ExpressionText[pos] != ' ' && ExpressionText[pos] >= 48 && ExpressionText[pos] < 57 && ExpressionText.Length < pos)
+			{
+				number = number * 10 + ExpressionText[pos] - '0';
+				pos++;
+			}
+
+			return number;
 		}
 
 		/// <summary>
@@ -116,7 +123,7 @@ namespace ExpressionInterpreter.Logic
 		/// <param name="pos"></param>
 		private void SkipBlanks(ref int pos)
 		{
-			while(ExpressionText[pos] != ' ')
+			while(ExpressionText[pos] != ' ' && ExpressionText.Length < pos)
 			{
 				pos++;
 			}
