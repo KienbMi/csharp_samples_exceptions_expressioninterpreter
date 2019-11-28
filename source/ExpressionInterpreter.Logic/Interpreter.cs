@@ -21,13 +21,13 @@ namespace ExpressionInterpreter.Logic
 
         public double OperandRight
         {
-			get { return 1.2;}
+			get { return _operandRight; }
 
 		}
 
 		public char Op
         {
-            get { throw new NotImplementedException(); }
+            get { return _op; }
         }
 
 
@@ -43,7 +43,29 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public double Calculate()
         {
-            throw new NotImplementedException();
+            double result = 0;
+
+            if (Op.Equals('+'))
+            {
+                result = OperandLeft + OperandRight;
+            }
+            else if (Op.Equals('-'))
+            {
+                result = OperandLeft - OperandRight;
+            }
+            else if (Op.Equals('*'))
+            {
+                result = OperandLeft * OperandRight;
+            }
+            else if (Op.Equals('/'))
+            {
+                if (OperandRight != 0)
+                {
+                    result = OperandLeft / OperandRight;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
