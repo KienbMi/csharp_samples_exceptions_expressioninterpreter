@@ -3,39 +3,39 @@ using System.Text;
 
 namespace ExpressionInterpreter.Logic
 {
-    public class Interpreter
-    {
-        private double _operandLeft;
-        private double _operandRight;
-        private char _op;  // Operator                  
+	public class Interpreter
+	{
+		private double _operandLeft;
+		private double _operandRight;
+		private char _op;  // Operator                  
 
-        /// <summary>
-        /// Eingelesener Text
-        /// </summary>
-        public string ExpressionText { get; private set; }
+		/// <summary>
+		/// Eingelesener Text
+		/// </summary>
+		public string ExpressionText { get; private set; }
 
-        public double OperandLeft
-        {
-            get { return _operandLeft; }
-        }
+		public double OperandLeft
+		{
+			get { return _operandLeft; }
+		}
 
         public double OperandRight
         {
-			get { return _operandRight; }
+			get { return 1.2;}
 
 		}
 
 		public char Op
         {
-            get { return _op; }
+            get { throw new NotImplementedException(); }
         }
 
 
-        public void Parse(string expressionText)
-        {
-            ExpressionText = expressionText;
-            ParseExpressionStringToFields();
-        }
+		public void Parse(string expressionText)
+		{
+			ExpressionText = expressionText;
+			ParseExpressionStringToFields();
+		}
 
         /// <summary>
         /// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
@@ -43,30 +43,7 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public double Calculate()
         {
-
-            double result = 0;
-
-            if (Op.Equals('+'))
-            {
-                result = OperandLeft + OperandRight;
-            }
-            else if (Op.Equals('-'))
-            {
-                result = OperandLeft - OperandRight;
-            }
-            else if (Op.Equals('*'))
-            {
-                result = OperandLeft * OperandRight;
-            }
-            else if (Op.Equals('/'))
-            {
-                if (OperandRight != 0)
-                {
-                    result = OperandLeft / OperandRight;
-                }
-            }
-
-            return result;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -81,50 +58,50 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public void ParseExpressionStringToFields()
         {
-            int pos = 0;
-            SkipBlanks(ref pos);
-            
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Ein Double muss mit einer Ziffer beginnen. Gibt es Nachkommastellen,
-        /// müssen auch diese mit einer Ziffer beginnen.
-        /// </summary>
-        /// <param name="pos"></param>
-        /// <returns></returns>
-        private double ScanNumber(ref int pos)
-        {
-            throw new NotImplementedException();
-        }
+		/// <summary>
+		/// Ein Double muss mit einer Ziffer beginnen. Gibt es Nachkommastellen,
+		/// müssen auch diese mit einer Ziffer beginnen.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		private double ScanNumber(ref int pos)
+		{
+			throw new NotImplementedException();
+		}
 
-        /// <summary>
-        /// Eine Ganzzahl muss mit einer Ziffer beginnen.
-        /// </summary>
-        /// <param name="pos"></param>
-        /// <returns></returns>
-        private int ScanInteger(ref int pos)
-        {
-            throw new NotImplementedException();
-        }
+		/// <summary>
+		/// Eine Ganzzahl muss mit einer Ziffer beginnen.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		private int ScanInteger(ref int pos)
+		{
+			throw new NotImplementedException();
+		}
 
-        /// <summary>
-        /// Setzt die Position weiter, wenn Leerzeichen vorhanden sind
-        /// </summary>
-        /// <param name="pos"></param>
-        private void SkipBlanks(ref int pos)
-        {
-            throw new NotImplementedException();
-        }
+		/// <summary>
+		/// Setzt die Position weiter, wenn Leerzeichen vorhanden sind
+		/// </summary>
+		/// <param name="pos"></param>
+		private void SkipBlanks(ref int pos)
+		{
+			while(ExpressionText[pos] != ' ')
+			{
+				pos++;
+			}
+		}
 
-        /// <summary>
-        /// Exceptionmessage samt Innerexception-Texten ausgeben
-        /// </summary>
-        /// <param name="ex"></param>
-        /// <returns></returns>
-        public static string GetExceptionTextWithInnerExceptions(Exception ex)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		/// <summary>
+		/// Exceptionmessage samt Innerexception-Texten ausgeben
+		/// </summary>
+		/// <param name="ex"></param>
+		/// <returns></returns>
+		public static string GetExceptionTextWithInnerExceptions(Exception ex)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
