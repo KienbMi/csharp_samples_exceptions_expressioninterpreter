@@ -19,57 +19,57 @@ namespace ExpressionInterpreter.Logic
 			get { return _operandLeft; }
 		}
 
-        public double OperandRight
-        {
+		public double OperandRight
+		{
 			get { return _operandRight; }
 
 		}
 
 		public char Op
-        {
-            get { return _op; }
-        }
+		{
+			get { return _op; }
+		}
 
 
 		public void Parse(string expressionText)
 		{
+			if (expressionText == null || expressionText == "" || expressionText == " ")
+			{
+				throw new Exception("Ausdruck ist null oder empty!");
+			}
 			ExpressionText = expressionText;
 			ParseExpressionStringToFields();
 		}
 
-        /// <summary>
-        /// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
-        /// Fehlerhafte Operatoren und Division durch 0 werden über Exceptions zurückgemeldet
-        /// </summary>
-        public double Calculate()
-        {
-            double result = 0;
+		/// <summary>
+		/// Wertet den Ausdruck aus und gibt das Ergebnis zurück.
+		/// Fehlerhafte Operatoren und Division durch 0 werden über Exceptions zurückgemeldet
+		/// </summary>
+		public double Calculate()
+		{
+			double result = 0;
 
-            switch (Op)
-            {
-                case '+':
-                    result = OperandLeft + OperandRight;
-                    break;
-                case '-':
-                    result = OperandLeft - OperandRight;
-                    break;
-                case '*':
-                    result = OperandLeft * OperandRight;
-                    break;
-                case '/':
-                    if (OperandRight == 0)
-                    {
-                        throw new InvalidOperationException("Division durch 0 ist nicht erlaubt");
-                    }
-                    else
-                    {
-                        result = OperandLeft / OperandRight;
-                    }
-                    break;
-            }
+			switch (Op)
+			{
+				case '+':
+					result = OperandLeft + OperandRight;
+					break;
+				case '-':
+					result = OperandLeft - OperandRight;
+					break;
+				case '*':
+					result = OperandLeft * OperandRight;
+					break;
+				case '/':
+					if (OperandRight != 0)
+					{
+						result = OperandLeft / OperandRight;
+					}
+					break;
+			}
 
-            return result;
-        }
+			return result;
+		}
 
         /// <summary>
         /// Expressionstring in seine Bestandteile zerlegen und in die Felder speichern.
@@ -83,55 +83,13 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public void ParseExpressionStringToFields()
         {
-            if (String.IsNullOrEmpty(ExpressionText))
-            {
-                throw new ArgumentException("Ausdruck ist null oder empty!");
-            }
-
             int pos = 0;
-
-            // { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
-
-            try
-            {
-                _operandLeft = ScanNumber(ref pos);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException("Linker Operand ist fehlerhaft", ex);
-            }
-
-            _op = ScanOperator(ref pos);
-
-            try
-            {
-                _operandRight = ScanNumber(ref pos);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException("Rechter Operand ist fehlerhaft", ex);
-            }
-        }
-
-        private char ScanOperator(ref int pos)
-        {
-            if (pos >= ExpressionText.Length)
-            {
-                throw new ArgumentException("Operator fehlt komplett");
-            }
-
-            char op = ExpressionText[pos];
-
-            if (op != '+' &&
-                op != '-' &&
-                op != '*' &&
-                op != '/')
-            {
-                throw new ArgumentException($"Operator {op} ist fehlerhaft!");
-            }
-
-            pos++;
-            return op;
+            _operandLeft = ScanNumber(ref pos);
+            SkipBlanks(ref pos);
+            _op = ExpressionText[pos];
+            SkipBlanks(ref pos);
+            _operandRight = ScanNumber(ref pos);
+            SkipBlanks(ref pos);
         }
 
 		/// <summary>
@@ -142,56 +100,25 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private double ScanNumber(ref int pos)
 		{
-            SkipBlanks(ref pos);
+			double result;
+			double sign = 1;
 
-            if (pos >= ExpressionText.Length)
-            {
-                throw new ArgumentException("Zahl fehlt komplett");
-            }
-
-            double result;
-            double sign = ScanSign(ref pos);
-
-            try
-            {
-                result = ScanInteger(ref pos);
-            }
-            catch (Exception ex)
-            {
-                throw new ArgumentException("Ganzzahlanteil ist fehlerhaft", ex);
-            }
-            
-            if (pos < ExpressionText.Length && ExpressionText[pos].Equals(','))
-            {
-                pos++;
-                int startPos = pos;
-                try
-                {
-                    double decimalPlace = ScanInteger(ref pos);
-                    result += decimalPlace / (Math.Pow(10, pos - startPos));
-                }
-                catch (Exception ex)
-                {
-                    throw new ArgumentException("Nachkommaanteil ist fehlerhaft", ex);
-                }
-            }
-
-            SkipBlanks(ref pos);
-            return result *= sign;
-        }
-
-        private double ScanSign(ref int pos)
-        {
-            double sign = 1;
-            
-            if (ExpressionText[pos].Equals('-'))
-            {
-                sign = -sign;
-                pos++;
-                SkipBlanks(ref pos);
-            }
-            return sign;
-        }
+			if (ExpressionText[pos].Equals('-'))
+			{
+				sign = -sign;
+				pos++;
+				SkipBlanks(ref pos);
+			}
+			result = ScanInteger(ref pos);
+			if (ExpressionText[pos].Equals(','))
+			{
+				pos++;
+				int startPos = pos;
+				double decimalPlace = ScanInteger(ref pos);
+				result += decimalPlace / (Math.Pow(10, pos - startPos));
+			}
+			return result;
+		}
 
 		/// <summary>
 		/// Eine Ganzzahl muss mit einer Ziffer beginnen.
@@ -200,19 +127,12 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
-            int number = 0;
-
-            if (pos >= ExpressionText.Length || 
-                Char.IsDigit(ExpressionText[pos]) == false)
-            {
-                throw new ArgumentException("Integeranteil fehlt oder beginnt nicht mit Ziffer");
-            }
-            
-            while (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
-            {
-                number = number * 10 + ExpressionText[pos] - '0';
-                pos++;
-            }
+			int number = 0;
+			while(ExpressionText[pos] != ' ' && ExpressionText[pos] >= 48 && ExpressionText[pos] < 57 && ExpressionText.Length < pos)
+			{
+				number = number * 10 + ExpressionText[pos] - '0';
+				pos++;
+			}
 
             return number;
         }
@@ -223,11 +143,11 @@ namespace ExpressionInterpreter.Logic
 		/// <param name="pos"></param>
 		private void SkipBlanks(ref int pos)
 		{
-            while (pos < ExpressionText.Length && Char.IsWhiteSpace(ExpressionText[pos]))
-            {
-                pos++;
-            }
-        }
+			while(ExpressionText[pos] != ' ' && ExpressionText.Length < pos)
+			{
+				pos++;
+			}
+		}
 
 		/// <summary>
 		/// Exceptionmessage samt Innerexception-Texten ausgeben
@@ -236,22 +156,8 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		public static string GetExceptionTextWithInnerExceptions(Exception ex)
 		{
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Exceptionmessage: ");
-            sb.AppendLine(ex.Message);
 
-            Exception run = ex.InnerException;
-            int counter = 1;
-
-            while (run != null)
-            {
-                sb.Append($"Inner Exception {counter}: ");
-                sb.AppendLine(run.Message);
-                run = run.InnerException;
-                counter++;
-            }
-
-            return sb.ToString();
+			throw new NotImplementedException();
 		}
 	}
 }
