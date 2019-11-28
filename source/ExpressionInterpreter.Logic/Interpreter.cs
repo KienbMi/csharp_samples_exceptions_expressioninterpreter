@@ -45,24 +45,23 @@ namespace ExpressionInterpreter.Logic
         {
             double result = 0;
 
-            if (Op.Equals('+'))
+            switch (Op)
             {
-                result = OperandLeft + OperandRight;
-            }
-            else if (Op.Equals('-'))
-            {
-                result = OperandLeft - OperandRight;
-            }
-            else if (Op.Equals('*'))
-            {
-                result = OperandLeft * OperandRight;
-            }
-            else if (Op.Equals('/'))
-            {
-                if (OperandRight != 0)
-                {
-                    result = OperandLeft / OperandRight;
-                }
+                case '+':
+                    result = OperandLeft + OperandRight;
+                    break;
+                case '-':
+                    result = OperandLeft - OperandRight;
+                    break;
+                case '*':
+                    result = OperandLeft * OperandRight;
+                    break;
+                case '/':
+                    if (OperandRight != 0)
+                    {
+                        result = OperandLeft / OperandRight;
+                    }
+                    break;
             }
 
             return result;
@@ -80,7 +79,9 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public void ParseExpressionStringToFields()
         {
+            // { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
             int pos = 0;
+            SkipBlanks(ref pos);
             _operandLeft = ScanNumber(ref pos);
             SkipBlanks(ref pos);
             _op = ExpressionText[pos];
@@ -97,8 +98,25 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private double ScanNumber(ref int pos)
 		{
-			throw new NotImplementedException();
-		}
+            double result;
+            double sign = 1;
+
+            if (ExpressionText[pos].Equals('-'))
+            {
+                sign = -sign;
+                pos++;
+                SkipBlanks(ref pos);
+            }
+            result = ScanInteger(ref pos);
+            if (ExpressionText[pos].Equals(','))
+            {
+                pos++;
+                int startPos = pos;
+                double decimalPlace = ScanInteger(ref pos);
+                result += decimalPlace / (Math.Pow(10, pos - startPos));
+            }
+            return result;
+        }
 
 		/// <summary>
 		/// Eine Ganzzahl muss mit einer Ziffer beginnen.
@@ -107,15 +125,23 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
-			int number = 0;
-			while(ExpressionText[pos] != ' ' && ExpressionText[pos] >= 48 && ExpressionText[pos] < 57 && ExpressionText.Length < pos)
-			{
-				number = number * 10 + ExpressionText[pos] - '0';
-				pos++;
-			}
+            int number = 0;
 
-			return number;
-		}
+            if (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
+            {
+                while (pos < ExpressionText.Length && Char.IsDigit(ExpressionText[pos]))
+                {
+                    number = number * 10 + ExpressionText[pos] - '0';
+                    pos++;
+                }
+            }
+            else
+            {
+                pos++;
+            }
+
+            return number;
+        }
 
 		/// <summary>
 		/// Setzt die Position weiter, wenn Leerzeichen vorhanden sind
@@ -123,11 +149,11 @@ namespace ExpressionInterpreter.Logic
 		/// <param name="pos"></param>
 		private void SkipBlanks(ref int pos)
 		{
-			while(ExpressionText[pos] != ' ' && ExpressionText.Length < pos)
-			{
-				pos++;
-			}
-		}
+            while (ExpressionText.Length < pos && ExpressionText[pos] != ' ')
+            {
+                pos++;
+            }
+        }
 
 		/// <summary>
 		/// Exceptionmessage samt Innerexception-Texten ausgeben
