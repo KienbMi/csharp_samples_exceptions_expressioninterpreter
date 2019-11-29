@@ -33,7 +33,12 @@ namespace ExpressionInterpreter.Logic
 
 		public void Parse(string expressionText)
 		{
-			ExpressionText = expressionText;
+            if (String.IsNullOrEmpty(expressionText))
+            {
+                throw new ArgumentException("Ausdruck ist null oder empty!");
+            }
+
+            ExpressionText = expressionText;
 			ParseExpressionStringToFields();
 		}
 
@@ -83,11 +88,6 @@ namespace ExpressionInterpreter.Logic
         /// </summary>
         public void ParseExpressionStringToFields()
         {
-            if (String.IsNullOrEmpty(ExpressionText))
-            {
-                throw new ArgumentException("Ausdruck ist null oder empty!");
-            }
-
             int pos = 0;
 
             // { }[-]{ }D{D}[,D{D}]{ }(+|-|*|/){ }[-]{ }D{D}[,D{D}]{ }
