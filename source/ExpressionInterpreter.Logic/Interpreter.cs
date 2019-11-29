@@ -113,8 +113,16 @@ namespace ExpressionInterpreter.Logic
             }
         }
 
+        /// <summary>
+        /// DerOperator wird auf Gültigkeit überprüft.
+        /// +, -, *, / sind zulässig
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
         private char ScanOperator(ref int pos)
         {
+            SkipBlanks(ref pos);
+
             if (pos >= ExpressionText.Length)
             {
                 throw new ArgumentException("Operator fehlt komplett");
@@ -176,19 +184,24 @@ namespace ExpressionInterpreter.Logic
                 }
             }
 
-            SkipBlanks(ref pos);
             return result *= sign;
         }
 
+        /// <summary>
+        /// Es wird das negative Vorzeichen ausgewertet
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
         private double ScanSign(ref int pos)
         {
+            SkipBlanks(ref pos);
+
             double sign = 1;
             
             if (ExpressionText[pos].Equals('-'))
             {
                 sign = -sign;
                 pos++;
-                SkipBlanks(ref pos);
             }
             return sign;
         }
@@ -200,6 +213,7 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
+            SkipBlanks(ref pos);
             int number = 0;
 
             if (pos >= ExpressionText.Length || 
