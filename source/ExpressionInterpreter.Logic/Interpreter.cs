@@ -86,7 +86,7 @@ namespace ExpressionInterpreter.Logic
         ///         Zahlen double/int
         ///         Trennzeichen Leerzeichen zwischen OP, Vorzeichen und Zahlen
         /// </summary>
-        public void ParseExpressionStringToFields()
+        private void ParseExpressionStringToFields()
         {
             int pos = 0;
 
