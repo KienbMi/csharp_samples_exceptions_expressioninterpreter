@@ -64,7 +64,7 @@ namespace ExpressionInterpreter.Logic
                 case '/':
                     if (OperandRight == 0)
                     {
-                        throw new InvalidOperationException("Division durch 0 ist nicht erlaubt");
+                        throw new DivideByZeroException("Division durch 0 ist nicht erlaubt");
                     }
                     else
                     {
@@ -110,6 +110,12 @@ namespace ExpressionInterpreter.Logic
             catch (Exception ex)
             {
                 throw new ArgumentException("Rechter Operand ist fehlerhaft", ex);
+            }
+
+            SkipBlanks(ref pos);
+            if (pos < ExpressionText.Length)
+            {
+                throw new ArgumentException("Ende des Ausdrucks ungültig");
             }
         }
 
@@ -213,7 +219,6 @@ namespace ExpressionInterpreter.Logic
 		/// <returns></returns>
 		private int ScanInteger(ref int pos)
 		{
-            SkipBlanks(ref pos);
             int number = 0;
 
             if (pos >= ExpressionText.Length || 
